@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.0.0
+// @version      1.0.1
 // @description  Controles manuais para filtrar vagas, salvar vagas na central e gerenciar ações visíveis do LinkedIn.
 // @author       luascfl
 // @license      MIT
+// @updateURL    https://raw.githubusercontent.com/luascfl/linkedin-workflow-suite/main/linkedin-workflow-suite.user.js
+// @downloadURL  https://raw.githubusercontent.com/luascfl/linkedin-workflow-suite/main/linkedin-workflow-suite.user.js
 // @match        https://www.linkedin.com/*
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -47,7 +49,7 @@
     if (accessToken === null) return;
     GM_setValue(STORAGE_KEYS.endpoint, endpoint.trim());
     GM_setValue(STORAGE_KEYS.token, accessToken.trim());
-    setStatus('Adapter configurado neste navegador.');
+    document.getElementById(PANEL_ID)?.remove();
   }
 
   function requestAdapter(operation, payload) {
