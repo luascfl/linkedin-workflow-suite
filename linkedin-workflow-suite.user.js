@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.0.1
+// @version      1.0.2
 // @description  Controles manuais para filtrar vagas, salvar vagas na central e gerenciar ações visíveis do LinkedIn.
 // @author       luascfl
 // @license      MIT
@@ -237,8 +237,12 @@
 
   let previousPath = '';
   const renderForRoute = () => {
-    if (location.pathname === previousPath && document.getElementById(PANEL_ID)) return;
+    if (location.pathname === previousPath) return;
     previousPath = location.pathname;
+    if (configuredAdapter()) {
+      document.getElementById(PANEL_ID)?.remove();
+      return;
+    }
     mountPanel();
   };
 
