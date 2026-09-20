@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.3.5
+// @version      1.3.6
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
@@ -101,7 +101,6 @@
       } else {
         badge.onclick = () => this.toggleFilter(type);
         if (type === 'keyword') {
-          badge.title = "Clique com o botão direito para editar as palavras-chave";
           badge.oncontextmenu = (e) => {
             e.preventDefault();
             const newKeywords = prompt('Palavras-chave (separadas por vírgula):', this.keywords.join(', '));
@@ -127,6 +126,10 @@
       badge.innerHTML = '';
       const badgeText = this.getLocalizedTerm(type, this.getPageLanguage());
       badge.appendChild(document.createTextNode(badgeText));
+      
+      if (type === 'keyword') {
+        badge.title = `Palavras bloqueadas:\n${this.keywords.join(', ')}\n\n(Clique com o botão direito para editar)`;
+      }
       
       if (type !== 'dismissAll') {
         const countDiv = document.createElement('div');
