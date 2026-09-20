@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.2.0
+// @version      1.2.1
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
@@ -276,7 +276,35 @@
   }
 
   function notificationCards() {
-    return [...document.querySelectorAll('article.nt-card, .nt-card-list article')];
+    const legacyCards = [...document.querySelectorAll('article.nt-card, .nt-card-list article')];
+    if (legacyCards.length) return legacyCards;
+
+    return [...new Set([...document.querySelectorAll('button[aria-label="Mais opções"]')]
+      .map((button) => {
+        let card = button;
+        for (let level = 0; level < 4 && card; level += 1) card = card.parentElement;
+        return card;
+      })
+      .filter(Boolean))];
+  }
+
+  function waitForElement(getElement, timeout = 4000) {
+    return new Promise((resolve) => {
+      let observer;
+      const finish = (element) => {
+        window.clearTimeout(timer);
+        observer?.disconnect();
+        resolve(element || null);
+      };
+      const check = () => {
+        const element = getElement();
+        if (element) finish(element);
+      };
+      const timer = window.setTimeout(() => finish(null), timeout);
+      observer = new MutationObserver(check);
+      observer.observe(document.documentElement, { childList: true, subtree: true });
+      check();
+    });
   }
 
   function prepareNotifications(selected) {
@@ -311,23 +339,55 @@
       : 'Seleção de notificações removida.');
   }
 
-  function installLegacyNotificationMenu() {
-    prepareNotifications();
-    const container = document.querySelector('.artdeco-card.nt-pill-list.mb3');
-    if (!container || container.querySelector('[data-linkedin-workflow-suite="notification-menu"]')) return;
+  function notificationMenuAnchor() {
+    const legacy = document.querySelector('.artdeco-card.nt-pill-list.mb3');
+    if (legacy) return legacy;
+    const allFilter = [...document.querySelectorAll('[role="radio"]')]
+      .find((element) => normalize(element.textContent) === 'Todas');
+    return allFilter?.parentElement?.parentElement || null;
+  }
 
-    const addLegacyButton = (label, handler) => {
+  function installLegacyNotificationMenu() {
+    installStyles();
+    prepareNotifications();
+    if (document.getElementById('linkedin-workflow-suite-notification-menu')) return;
+    const anchor = notificationMenuAnchor();
+    if (!anchor) return;
+
+    const container = document.createElement('div');
+    container.id = 'linkedin-workflow-suite-notification-menu';
+    container.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;';
+    const addLegacyButton = (label, handler, danger = false) => {
       const button = document.createElement('button');
       button.textContent = label;
       button.type = 'button';
       button.dataset.linkedinWorkflowSuite = 'notification-menu';
-      button.className = 'artdeco-pill artdeco-pill--slate artdeco-pill--3 artdeco-pill--choice nt-pill';
+      button.style.cssText = `background:${danger ? '#b42318' : '#0a66c2'};border:0;border-radius:16px;color:#fff;cursor:pointer;font:600 14px system-ui,sans-serif;padding:7px 12px;`;
       button.addEventListener('click', () => Promise.resolve(handler()).catch((error) => setStatus(error.message)));
-      container.prepend(button);
+      container.append(button);
     };
 
-    addLegacyButton('Excluir Notificações', deleteSelectedNotifications);
     addLegacyButton('Selecionar Tudo', toggleNotificationSelection);
+    addLegacyButton('Excluir Notificações', deleteSelectedNotifications, true);
+    anchor.after(container);
+  }
+
+  async function dismissNotification(card) {
+    const legacyDismiss = card.querySelector('[data-control-name="dismiss"], [href="#trash-medium"]');
+    if (legacyDismiss) {
+      legacyDismiss.click();
+      return true;
+    }
+
+    const more = card.querySelector('button[aria-label="Mais opções"]');
+    if (!more) return false;
+    more.click();
+    const dismiss = await waitForElement(() => [...document.querySelectorAll('[role="menuitem"]')]
+      .find((element) => normalize(element.textContent) === 'Excluir notificação'));
+    if (!dismiss) return false;
+    dismiss.click();
+    await waitForElement(() => !document.querySelector('[role="menu"]') ? document.body : null);
+    return true;
   }
 
   async function deleteSelectedNotifications() {
@@ -339,12 +399,7 @@
     if (!confirm(`Excluir definitivamente ${selected.length} notificação(ões) selecionada(s)?`)) return;
     let deleted = 0;
     for (const checkbox of selected) {
-      const card = checkbox.nextElementSibling;
-      const dismiss = card?.querySelector('[data-control-name="dismiss"]');
-      if (!dismiss) continue;
-      dismiss.click();
-      deleted += 1;
-      await wait(125);
+      if (await dismissNotification(checkbox.nextElementSibling)) deleted += 1;
     }
     setStatus(`${deleted}/${selected.length} notificação(ões) excluída(s).`);
   }
