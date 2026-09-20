@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.1.0
+// @version      1.2.0
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
@@ -291,6 +291,7 @@
         checkbox.dataset.linkedinWorkflowSuite = 'notification';
         checkbox.setAttribute('aria-label', 'Selecionar notificação');
         checkbox.style.cssText = 'height:20px;margin:10px;width:20px;';
+        card.style.marginLeft = '40px';
         card.before(checkbox);
       }
       if (typeof selected === 'boolean') checkbox.checked = selected;
@@ -298,6 +299,35 @@
     setStatus(selected === true
       ? `${cards.length} notificação(ões) selecionada(s).`
       : `${cards.length} notificação(ões) preparada(s) para revisão.`);
+  }
+
+  function toggleNotificationSelection() {
+    prepareNotifications();
+    const checkboxes = [...document.querySelectorAll('input[data-linkedin-workflow-suite="notification"]')];
+    const select = !checkboxes.length || !checkboxes.every((checkbox) => checkbox.checked);
+    checkboxes.forEach((checkbox) => { checkbox.checked = select; });
+    setStatus(select
+      ? `${checkboxes.length} notificação(ões) selecionada(s).`
+      : 'Seleção de notificações removida.');
+  }
+
+  function installLegacyNotificationMenu() {
+    prepareNotifications();
+    const container = document.querySelector('.artdeco-card.nt-pill-list.mb3');
+    if (!container || container.querySelector('[data-linkedin-workflow-suite="notification-menu"]')) return;
+
+    const addLegacyButton = (label, handler) => {
+      const button = document.createElement('button');
+      button.textContent = label;
+      button.type = 'button';
+      button.dataset.linkedinWorkflowSuite = 'notification-menu';
+      button.className = 'artdeco-pill artdeco-pill--slate artdeco-pill--3 artdeco-pill--choice nt-pill';
+      button.addEventListener('click', () => Promise.resolve(handler()).catch((error) => setStatus(error.message)));
+      container.prepend(button);
+    };
+
+    addLegacyButton('Excluir Notificações', deleteSelectedNotifications);
+    addLegacyButton('Selecionar Tudo', toggleNotificationSelection);
   }
 
   async function deleteSelectedNotifications() {
@@ -412,6 +442,32 @@
     setStatus(`Perfil legado aplicado: ${applied} etapa(s).`);
   }
 
+  function registerLegacyCommand(label, matchesCurrentRoute, destination, action) {
+    GM_registerMenuCommand(label, () => {
+      if (!matchesCurrentRoute()) {
+        location.assign(`https://www.linkedin.com${destination}`);
+        alert('A página necessária foi aberta. Execute novamente este comando após o carregamento.');
+        return;
+      }
+      Promise.resolve(action()).catch((error) => alert(`LinkedIn Workflow Suite: ${error.message}`));
+    });
+  }
+
+  function registerLegacyCommands() {
+    registerLegacyCommand('LinkedIn: filtrar resultados de vagas', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', filterJobs);
+    registerLegacyCommand('LinkedIn: salvar vagas visíveis na central', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', saveVisibleJobs);
+    registerLegacyCommand('LinkedIn: ignorar vaga marcada pelo fluxo legado', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', dismissJobFromLegacyCookie);
+    registerLegacyCommand('LinkedIn: expandir alertas de vaga', () => location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage'), '/jobs/jam/', expandVisibleSections);
+    registerLegacyCommand('LinkedIn: atualizar preferências dos alertas', () => location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage'), '/jobs/jam/', updateJobAlertPreferences);
+    registerLegacyCommand('LinkedIn: excluir todos os alertas', () => location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage'), '/jobs/jam/', deleteAllJobAlerts);
+    registerLegacyCommand('LinkedIn: expandir tópicos em alta', () => location.pathname.startsWith('/feed'), '/feed/', expandVisibleSections);
+    registerLegacyCommand('LinkedIn: seguir empresas visíveis', () => location.pathname.startsWith('/search/results/companies'), '/search/results/companies/', () => performVisibleButtonAction('Seguir', 'Seguir'));
+    registerLegacyCommand('LinkedIn: conectar com pessoas visíveis', () => location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork'), '/mynetwork/', () => performVisibleButtonAction('Conectar', 'Conectar'));
+    registerLegacyCommand('LinkedIn: ativar seleção de notificações', () => location.pathname.startsWith('/notifications'), '/notifications/?filter=all', installLegacyNotificationMenu);
+    registerLegacyCommand('LinkedIn: excluir notificações selecionadas', () => location.pathname.startsWith('/notifications'), '/notifications/?filter=all', deleteSelectedNotifications);
+    registerLegacyCommand('LinkedIn: aplicar perfil legado de notificações', () => location.pathname.startsWith('/mypreferences/d/categories/notifications'), '/mypreferences/d/categories/notifications', applyArchivedNotificationPreferences);
+  }
+
   function mountPanel() {
     installStyles();
     const oldPanel = document.getElementById(PANEL_ID);
@@ -448,23 +504,17 @@
     if (location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork')) {
       addButton('Conectar com pessoas visíveis', () => performVisibleButtonAction('Conectar', 'Conectar'));
     }
-    if (location.pathname.startsWith('/notifications')) {
-      addButton('Selecionar todas as notificações', () => prepareNotifications(true));
-      addButton('Preparar notificações para revisão', prepareNotifications, 'secondary');
-      addButton('Excluir notificações selecionadas', deleteSelectedNotifications, 'danger');
-    }
-    if (location.pathname.startsWith('/mypreferences/d/categories/notifications')) {
-      addButton('Aplicar perfil legado de notificações', applyArchivedNotificationPreferences, 'danger');
-    }
-    addButton('Configurar adapter', configureAdapter, 'secondary');
+    if (!configuredAdapter()) addButton('Configurar adapter', configureAdapter, 'secondary');
     panel.append(actions);
     document.body.append(panel);
   }
 
   let previousPath = '';
   const renderForRoute = () => {
-    if (location.pathname === previousPath) return;
+    const routeChanged = location.pathname !== previousPath;
     previousPath = location.pathname;
+    if (location.pathname.startsWith('/notifications')) installLegacyNotificationMenu();
+    if (!routeChanged) return;
     if (configuredAdapter()) {
       document.getElementById(PANEL_ID)?.remove();
       return;
@@ -472,9 +522,9 @@
     mountPanel();
   };
 
-  GM_registerMenuCommand('Configurar Workflow Sheets Adapter', configureAdapter);
+  if (!configuredAdapter()) GM_registerMenuCommand('Configurar Workflow Sheets Adapter', configureAdapter);
   GM_registerMenuCommand('Reabrir painel LinkedIn Workflow Suite', mountPanel);
-  GM_registerMenuCommand('Ignorar vaga marcada pelo fluxo legado', dismissJobFromLegacyCookie);
+  registerLegacyCommands();
   renderForRoute();
   new MutationObserver(renderForRoute).observe(document.documentElement, { childList: true, subtree: true });
 })();
