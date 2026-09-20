@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.3.0
+// @version      1.3.1
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
@@ -183,6 +183,11 @@
       saved += 1;
     }
     setStatus(`${saved} vaga(s) salva(s) na planilha central.`);
+  }
+
+  function expandVisibleSectionsSilently() {
+    const buttons = [...document.querySelectorAll('button')].filter((button) => /^(mostrar|exibir) mais(?:\b|$)/i.test(normalize(button.textContent)));
+    buttons.forEach((button) => button.click());
   }
 
   function expandVisibleSections() {
@@ -525,9 +530,6 @@
         ],
       };
     }
-    if (location.pathname.startsWith('/feed')) {
-      return { title: 'Feed', actions: [['Expandir tópicos visíveis', expandVisibleSections]] };
-    }
     if (location.pathname.startsWith('/search/results/companies')) {
       return { title: 'Empresas', actions: [['Seguir empresas visíveis', () => performVisibleButtonAction('Seguir', 'Seguir')]] };
     }
@@ -637,7 +639,7 @@
   const renderForRoute = () => {
     const routeChanged = location.pathname !== previousPath;
     previousPath = location.pathname;
-    if (location.pathname.startsWith('/notifications')) installLegacyNotificationMenu();
+    if (location.pathname.startsWith('/feed')) expandVisibleSectionsSilently();
     installRouteActionBar();
     if (!routeChanged) return;
     if (configuredAdapter()) {
