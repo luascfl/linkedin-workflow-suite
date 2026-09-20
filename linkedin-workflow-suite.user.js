@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.3.6
+// @version      1.3.7
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
@@ -155,17 +155,23 @@
     }
 
     setupMutationObserver() {
-      let jobContainer = null;
       let timeout = null;
-      const observer = new MutationObserver(() => {
+      const observer = new MutationObserver((mutations) => {
+        const isOwnMutation = mutations.every(m => 
+          (m.target.id && typeof m.target.id === 'string' && m.target.id.includes('Badge')) || 
+          (m.target.className && typeof m.target.className === 'string' && m.target.className.includes('linkedin-workflow-suite-filter-badge')) ||
+          (m.target.parentElement && m.target.parentElement.className && typeof m.target.parentElement.className === 'string' && m.target.parentElement.className.includes('linkedin-workflow-suite-filter-badge'))
+        );
+        if (isOwnMutation) return;
+
         if (timeout) clearTimeout(timeout);
         timeout = setTimeout(() => {
           if (this.isJobPage()) this.applyAllFilters();
         }, 300);
       });
 
-      jobContainer = document.querySelector('.jobs-search-results-list, .jobs-search__results-list');
-      observer.observe(jobContainer || document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+      const target = document.querySelector('.jobs-search-results-list, .jobs-search__results-list') || document.body;
+      observer.observe(target, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     }
 
     applyAllFilters() {
