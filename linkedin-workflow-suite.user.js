@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.3.1
+// @version      1.3.2
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
@@ -748,7 +748,6 @@
   }
 
   function registerLegacyCommands() {
-    registerLegacyCommand('LinkedIn: filtrar resultados de vagas', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', filterJobs);
     registerLegacyCommand('LinkedIn: salvar vagas visíveis na central', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', saveVisibleJobs);
     registerLegacyCommand('LinkedIn: ignorar vaga marcada pelo fluxo legado', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', dismissJobFromLegacyCookie);
     registerLegacyCommand('LinkedIn: expandir alertas de vaga', () => location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage'), '/jobs/jam/', expandVisibleSections);
