@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.3.3
+// @version      1.3.4
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
@@ -49,7 +49,8 @@
         dismissed: new Set(), promoted: new Set(), applied: new Set(),
         viewed: new Set(), reposted: new Set(), keyword: new Set()
       };
-
+      
+      this.badges = {};
       const savedKeywords = typeof GM_getValue === 'function' ? GM_getValue('linkedinKeywords', '') : '';
       this.keywords = savedKeywords ? savedKeywords.split(',').map(k => k.trim()) : BLOCKED_JOB_TERMS;
       this.init();
