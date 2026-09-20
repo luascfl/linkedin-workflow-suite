@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.3.4
+// @version      1.3.5
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
