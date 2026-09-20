@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.2.1
+// @version      1.3.0
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
@@ -30,6 +30,7 @@
   ]);
   const MAX_BULK_ACTIONS = 20;
   const PANEL_ID = 'linkedin-workflow-suite-panel';
+  const ROUTE_ACTION_BAR_ID = 'linkedin-workflow-suite-actions';
   const HIDDEN_CLASS = 'linkedin-workflow-suite-hidden';
   const NOTIFICATION_PREFERENCE_ACTIONS = Object.freeze(JSON.parse('[["enter","Pesquisando vaga"],["toggle","Permitir notificações de pesquisa de vagas",true],["enter","Alertas de vaga"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",true],["back"],["enter","Vagas salvas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",true],["back"],["enter","Recomendações de vagas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações sobre candidaturas a vagas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",true],["back"],["enter","Aconselhamento profissional"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Ocorrências em resultados de pesquisa"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Recomendações de avaliação de competências"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações de rotas de competências"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Contratação"],["toggle","Permitir notificações de anúncios de vaga",false],["enter","Projetos de Service Page"],["toggle","Permitir notificações de trabalho de projeto",false],["back"],["enter","Conexão com outras pessoas"],["toggle","Permitir notificações relacionadas a conexões",true],["enter","Convites para conexão"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Atualizações da sua rede"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações para conexão"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Novos seguidores e assinantes"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Atualizações de pessoas que você segue"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações para seguir"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Visualizações do perfil"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações dos seus leads de vendas"],["toggle","Notificações no aplicativo",true],["back"],["back"],["enter","Atualizações para ficar por dentro da rede"],["enter","Mudanças de emprego"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["back"],["enter","Contratando"],["toggle","Notificações no aplicativo",false],["back"],["enter","Aniversários"],["toggle","Notificações no aplicativo",true],["back"],["enter","Aniversários de empresa"],["toggle","Notificações no aplicativo",true],["back"],["enter","Formação acadêmica"],["toggle","Notificações no aplicativo",true],["back"],["enter","Resumo semanal"],["toggle","Notificações push",false],["toggle","E-mail",true],["back"],["back"],["enter","Publicar e comentar"],["toggle","Permitir notificações relacionadas a publicações",true],["enter","Comentários e reações"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Compartilhamentos"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Menções"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Conversas em alta"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Vídeos ao vivo"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Newsletters"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Lembretes para publicar"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Artigos colaborativos"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Sugestões de publicações"],["toggle","Notificações no aplicativo",false],["back"],["enter","Vídeos recomendados"],["toggle","Notificações no aplicativo",false],["back"],["back"],["enter","Mensagens"],["toggle","Permitir notificações de mensagens",true],["enter","Mensagens"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",true],["toggle","E-mail",false],["back"],["enter","Lembretes de mensagem"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","InMail"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Lembretes de InMail"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Grupos"],["toggle","Permitir notificações de grupos",false],["back"],["enter","Pages"],["toggle","Permitir notificações da Page",false],["back"],["enter","Participar de eventos"],["toggle","Permitir notificações de eventos",false],["back"],["enter","Notícias e relatórios"],["toggle","Permitir notificações dos editores",false],["enter","Relatórios e estatísticas"],["toggle","Permitir notificações sobre relatórios e estatísticas",false],["back"],["enter","Atualização do perfil"],["toggle","Permitir notificações de aprimoramento do perfil",true],["enter","Recomendações de perfis"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações de competências"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Dicas e ofertas para aproveitar o LinkedIn"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Verificações"],["toggle","Permitir notificações de verificação",true],["enter","Fazer verificação"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["back"],["enter","Jogos"],["toggle","Permitir notificações sobre jogos",false],["back"]]'));
 
@@ -97,6 +98,11 @@
       #${PANEL_ID} button.secondary { background: #4b5563; }
       #${PANEL_ID} button.danger { background: #b42318; }
       #${PANEL_ID} .status { color: #374151; min-height: 18px; }
+      #${ROUTE_ACTION_BAR_ID} { align-items:center; background:#fff; border:1px solid #d0d7de; border-radius:8px; display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:10px; }
+      #${ROUTE_ACTION_BAR_ID} strong { color:#172033; font:600 14px system-ui,sans-serif; margin-right:4px; }
+      #${ROUTE_ACTION_BAR_ID} button { background:#0a66c2; border:0; border-radius:16px; color:#fff; cursor:pointer; font:600 14px system-ui,sans-serif; padding:7px 12px; }
+      #${ROUTE_ACTION_BAR_ID} button.danger { background:#b42318; }
+      #${ROUTE_ACTION_BAR_ID} .status { color:#374151; flex-basis:100%; font:12px system-ui,sans-serif; min-height:16px; }
     `;
     document.head.append(style);
   }
@@ -114,7 +120,7 @@
   }
 
   function setStatus(message) {
-    const status = document.querySelector(`#${PANEL_ID} .status`);
+    const status = document.querySelector(`#${PANEL_ID} .status, #${ROUTE_ACTION_BAR_ID} .status`);
     if (status) status.textContent = message;
   }
 
@@ -180,7 +186,7 @@
   }
 
   function expandVisibleSections() {
-    const buttons = [...document.querySelectorAll('button')].filter((button) => /^(mostrar|exibir) mais$/i.test(normalize(button.textContent)));
+    const buttons = [...document.querySelectorAll('button')].filter((button) => /^(mostrar|exibir) mais(?:\b|$)/i.test(normalize(button.textContent)));
     buttons.forEach((button) => button.click());
     setStatus(`${buttons.length} seção(ões) expandidas.`);
   }
@@ -497,6 +503,69 @@
     setStatus(`Perfil legado aplicado: ${applied} etapa(s).`);
   }
 
+  function routeActionDefinitions() {
+    if (location.pathname.startsWith('/jobs/search')) {
+      return {
+        title: 'Vagas',
+        actions: [
+          ['Filtrar vagas visíveis', filterJobs],
+          ['Salvar vagas visíveis na central', saveVisibleJobs],
+          ['Ignorar vaga pelo ID', dismissJobById],
+          ['Ignorar vaga marcada pelo fluxo legado', dismissJobFromLegacyCookie],
+        ],
+      };
+    }
+    if (location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage')) {
+      return {
+        title: 'Alertas de vaga',
+        actions: [
+          ['Expandir alertas visíveis', expandVisibleSections],
+          ['Atualizar preferências dos alertas', updateJobAlertPreferences],
+          ['Excluir todos os alertas', deleteAllJobAlerts, 'danger'],
+        ],
+      };
+    }
+    if (location.pathname.startsWith('/feed')) {
+      return { title: 'Feed', actions: [['Expandir tópicos visíveis', expandVisibleSections]] };
+    }
+    if (location.pathname.startsWith('/search/results/companies')) {
+      return { title: 'Empresas', actions: [['Seguir empresas visíveis', () => performVisibleButtonAction('Seguir', 'Seguir')]] };
+    }
+    if (location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork')) {
+      return { title: 'Pessoas', actions: [['Conectar com pessoas visíveis', () => performVisibleButtonAction('Conectar', 'Conectar')]] };
+    }
+    if (location.pathname.startsWith('/mypreferences/d/categories/notifications')) {
+      return { title: 'Preferências de notificação', actions: [['Aplicar perfil legado de notificações', applyArchivedNotificationPreferences, 'danger']] };
+    }
+    return null;
+  }
+
+  function installRouteActionBar() {
+    const definition = routeActionDefinitions();
+    if (!definition || document.getElementById(ROUTE_ACTION_BAR_ID)) return;
+    const main = document.querySelector('main, [role="main"]');
+    if (!main) return;
+    installStyles();
+    const bar = document.createElement('section');
+    bar.id = ROUTE_ACTION_BAR_ID;
+    const title = document.createElement('strong');
+    title.textContent = `LinkedIn: ${definition.title}`;
+    bar.append(title);
+    definition.actions.forEach(([label, handler, className = '']) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.className = className;
+      button.addEventListener('click', () => Promise.resolve(handler()).catch((error) => setStatus(error.message)));
+      bar.append(button);
+    });
+    const status = document.createElement('span');
+    status.className = 'status';
+    status.setAttribute('role', 'status');
+    bar.append(status);
+    main.prepend(bar);
+  }
+
   function registerLegacyCommand(label, matchesCurrentRoute, destination, action) {
     GM_registerMenuCommand(label, () => {
       if (!matchesCurrentRoute()) {
@@ -569,6 +638,7 @@
     const routeChanged = location.pathname !== previousPath;
     previousPath = location.pathname;
     if (location.pathname.startsWith('/notifications')) installLegacyNotificationMenu();
+    installRouteActionBar();
     if (!routeChanged) return;
     if (configuredAdapter()) {
       document.getElementById(PANEL_ID)?.remove();
