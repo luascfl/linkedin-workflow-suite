@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.3.2
+// @version      1.3.3
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
@@ -36,13 +36,13 @@
   class LinkedInJobFilter {
     constructor() {
       this.filters = {
-        dismissed: { count: 0, active: true, color: '#01754f', position: 64 },
-        promoted: { count: 0, active: true, color: '#0a66c2', position: 125 },
-        applied: { count: 0, active: true, color: '#e7a33e', position: 160 },
-        viewed: { count: 0, active: false, color: '#cb112d', position: 195 },
-        reposted: { count: 0, active: true, color: '#666666', position: 230 },
-        keyword: { count: 0, active: false, color: '#666666', position: 265 },
-        dismissAll: { active: true, color: '#01754f', position: 300 }
+        dismissed: { count: 0, active: true, color: '#01754f', position: 114 },
+        promoted: { count: 0, active: true, color: '#0a66c2', position: 175 },
+        applied: { count: 0, active: true, color: '#e7a33e', position: 210 },
+        viewed: { count: 0, active: false, color: '#cb112d', position: 245 },
+        reposted: { count: 0, active: true, color: '#666666', position: 280 },
+        keyword: { count: 0, active: false, color: '#666666', position: 315 },
+        dismissAll: { active: true, color: '#01754f', position: 350 }
       };
 
       this.countedJobIds = {
@@ -50,8 +50,8 @@
         viewed: new Set(), reposted: new Set(), keyword: new Set()
       };
 
-      this.badges = {};
-      this.keywords = BLOCKED_JOB_TERMS;
+      const savedKeywords = typeof GM_getValue === 'function' ? GM_getValue('linkedinKeywords', '') : '';
+      this.keywords = savedKeywords ? savedKeywords.split(',').map(k => k.trim()) : BLOCKED_JOB_TERMS;
       this.init();
     }
 
@@ -95,10 +95,24 @@
       
       if (type === 'dismissAll') {
         badge.onclick = () => this.dismissAllJobs();
-        badge.style.opacity = '1';
+        badge.style.opacity = '0.85';
         badge.style.backgroundColor = this.filters[type].color;
       } else {
         badge.onclick = () => this.toggleFilter(type);
+        if (type === 'keyword') {
+          badge.title = "Clique com o botão direito para editar as palavras-chave";
+          badge.oncontextmenu = (e) => {
+            e.preventDefault();
+            const newKeywords = prompt('Palavras-chave (separadas por vírgula):', this.keywords.join(', '));
+            if (newKeywords !== null) {
+              this.keywords = newKeywords.split(',').map(k => k.trim()).filter(Boolean);
+              if (typeof GM_setValue === 'function') GM_setValue('linkedinKeywords', this.keywords.join(', '));
+              this.countedJobIds.keyword.clear();
+              this.filters.keyword.count = 0;
+              this.applyAllFilters();
+            }
+          };
+        }
       }
       
       this.updateBadgeContent(badge, type);
@@ -118,7 +132,7 @@
         countDiv.innerText = filter.active ? filter.count : 'OFF';
         countDiv.style.cssText = 'align-items:center;background-color:#f8fafd;border-radius:20px;color:#00000099;display:inline-flex;font-size:14px;height:20px;justify-content:center;margin-left:5px;min-width:20px;padding:5px;user-select:none;';
         badge.appendChild(countDiv);
-        badge.style.opacity = filter.active && filter.count > 0 ? '1' : '0.5';
+        badge.style.opacity = filter.active && filter.count > 0 ? '0.85' : '0.5';
         badge.style.backgroundColor = filter.active ? filter.color : '#666666';
       }
       return badge;
