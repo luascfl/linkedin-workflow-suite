@@ -9,7 +9,7 @@ Single userscript replacing the archived LinkedIn Automa workflows with manual, 
 3. **Delete Job Alerts**: Progressively loads more alerts up to 6 clicks before prompting for confirmation to delete visible alerts (`Excluir todos os alertas` on `/jobs/jam` or `/jobs/alerts/manage`).
 4. **Update Job Alerts**: Progressively loads alerts and converts daily email+notification alerts to email-only while disabling similar-job notifications (`Atualizar preferências dos alertas`).
 5. **Expand Job Alerts**: Expands collapsed job alert sections (`Expandir alertas visíveis`).
-6. **Expand Trending Topics**: Expands feed news sections (`Expandir tópicos visíveis`).
+6. **Expand Trending Topics**: Automatically expands feed news sections without adding a button or panel.
 7. **Follow Companies**: Iterates through visible companies across up to 5 pages (capped at 20 actions) under explicit command and confirmation (`Seguir empresas visíveis`).
 8. **Connect with People**: Sends connection requests across up to 5 pages (capped at 20 actions), explicitly choosing "Send without a note" in confirmation modals (`Conectar com pessoas visíveis`).
 9. **Delete Notifications**: Restores in-page `Selecionar Tudo` and `Excluir Notificações` controls on `/notifications` with persistent checkboxes across SPA DOM re-renders.

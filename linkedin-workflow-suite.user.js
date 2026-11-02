@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.4.3
+// @version      1.4.4
 // @description  Manual LinkedIn workflows with contextual actions and navigation commands.
 // @author       luascfl
 // @license      MIT
@@ -887,14 +887,6 @@
         ],
       };
     }
-    if (location.pathname.startsWith('/feed')) {
-      return {
-        title: 'Feed',
-        actions: [
-          ['Expandir tópicos visíveis', expandVisibleSections],
-        ],
-      };
-    }
     if (location.pathname.startsWith('/search/results/companies')) {
       return { title: 'Empresas', actions: [['Seguir empresas visíveis', () => performPaginatedButtonAction(['Seguir', 'Follow'], 'Follow')]] };
     }
@@ -986,9 +978,6 @@
       addButton('Selecionar Tudo', toggleNotificationSelection);
       addButton('Excluir notificações selecionadas', deleteSelectedNotifications, 'danger');
     }
-    if (location.pathname.startsWith('/feed')) {
-      addButton('Expandir tópicos visíveis', expandVisibleSections);
-    }
     if (location.pathname.startsWith('/search/results/companies')) {
       addButton('Seguir empresas visíveis', () => performPaginatedButtonAction(['Seguir', 'Follow'], 'Follow'));
     }
@@ -1007,7 +996,12 @@
   const renderForRoute = () => {
     const routeChanged = location.pathname !== previousPath;
     previousPath = location.pathname;
-    if (location.pathname.startsWith('/feed')) expandVisibleSectionsSilently();
+    if (location.pathname.startsWith('/feed')) {
+      expandVisibleSectionsSilently();
+      document.getElementById(ROUTE_ACTION_BAR_ID)?.remove();
+      document.getElementById(PANEL_ID)?.remove();
+      return;
+    }
     
     // Garante inicialização das badges visuais na página de vagas
     if (location.pathname.startsWith('/jobs/search') && !document.querySelector('.linkedin-workflow-suite-filter-badge')) {
