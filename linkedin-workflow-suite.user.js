@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.4.1
+// @version      1.4.2
 // @description  Manual LinkedIn workflows with contextual actions and navigation commands.
 // @author       luascfl
 // @license      MIT
@@ -953,31 +953,6 @@
     }
   }
 
-  function registerLegacyCommand(label, matchesCurrentRoute, destination, action) {
-    GM_registerMenuCommand(label, () => {
-      if (!matchesCurrentRoute()) {
-        location.assign(`https://www.linkedin.com${destination}`);
-        alert('A página necessária foi aberta. Execute novamente este comando após o carregamento.');
-        return;
-      }
-      Promise.resolve(action()).catch((error) => alert(`LinkedIn Workflow Suite: ${error.message}`));
-    });
-  }
-
-  function registerLegacyCommands() {
-    registerLegacyCommand('LinkedIn: filtrar vagas visíveis', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', () => (activeJobFilter?.applyAllFilters() || (activeJobFilter = new LinkedInJobFilter())));
-    registerLegacyCommand('LinkedIn: salvar vagas visíveis na central', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', saveVisibleJobs);
-    registerLegacyCommand('LinkedIn: ignorar vaga marcada pelo fluxo legado', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', dismissJobFromLegacyCookie);
-    registerLegacyCommand('LinkedIn: expandir alertas de vaga', () => location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage'), '/jobs/jam/', expandVisibleSections);
-    registerLegacyCommand('LinkedIn: atualizar preferências dos alertas', () => location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage'), '/jobs/jam/', updateJobAlertPreferences);
-    registerLegacyCommand('LinkedIn: excluir todos os alertas', () => location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage'), '/jobs/jam/', deleteAllJobAlerts);
-    registerLegacyCommand('LinkedIn: expandir tópicos em alta', () => location.pathname.startsWith('/feed'), '/feed/', expandVisibleSections);
-    registerLegacyCommand('LinkedIn: seguir empresas visíveis', () => location.pathname.startsWith('/search/results/companies'), '/search/results/companies/', () => performPaginatedButtonAction(['Seguir', 'Follow'], 'Follow'));
-    registerLegacyCommand('LinkedIn: conectar com pessoas visíveis', () => location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork'), '/mynetwork/', () => performPaginatedButtonAction(['Conectar', 'Connect'], 'Connect', sendConnectionWithoutNote));
-    registerLegacyCommand('LinkedIn: ativar seleção de notificações', () => location.pathname.startsWith('/notifications'), '/notifications/?filter=all', installLegacyNotificationMenu);
-    registerLegacyCommand('LinkedIn: excluir notificações selecionadas', () => location.pathname.startsWith('/notifications'), '/notifications/?filter=all', deleteSelectedNotifications);
-    registerLegacyCommand('LinkedIn: aplicar perfil legado de notificações', () => location.pathname.startsWith('/mypreferences/d/categories/notifications'), '/mypreferences/d/categories/notifications', applyArchivedNotificationPreferences);
-  }
 
   function mountPanel() {
     installStyles();
@@ -1050,9 +1025,6 @@
   };
 
   registerNavigationCommands();
-  if (!configuredAdapter()) GM_registerMenuCommand('Configurar Workflow Sheets Adapter', configureAdapter);
-  GM_registerMenuCommand('Reabrir painel LinkedIn Workflow Suite', mountPanel);
-  registerLegacyCommands();
   renderForRoute();
   new MutationObserver(renderForRoute).observe(document.documentElement, { childList: true, subtree: true });
 })();

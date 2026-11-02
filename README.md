@@ -19,14 +19,14 @@ Single userscript replacing the archived LinkedIn Automa workflows with manual, 
 ## Adapter Configuration
 
 1. Install `linkedin-workflow-suite.user.js` in Violentmonkey / Tampermonkey.
-2. Open any LinkedIn page and select **Configurar Workflow Sheets Adapter** from the userscript menu.
-3. Provide the `/exec` endpoint URL and the access token.
+2. Navigate to a supported LinkedIn surface and use its contextual panel.
+3. Choose **Configure adapter** from that panel, then provide the `/exec` endpoint URL and the access token.
 
 The endpoint and token are stored strictly in local userscript storage and are never committed or transmitted elsewhere.
 
 ## Navigation commands
 
-On any LinkedIn page, the userscript-manager menu provides direct navigation commands for job search, job alerts, feed, company search, people search, notifications, and notification preferences. They only navigate to the corresponding LinkedIn surface. Contextual actions remain separate and continue to require explicit invocation and confirmation.
+The userscript-manager menu contains only direct navigation commands. Contextual actions such as filtering jobs, following companies, connecting with people, managing alerts, and deleting notifications appear only on the LinkedIn surface where they apply and continue to require explicit invocation and confirmation.
 
 ## Safety & Limits
 
