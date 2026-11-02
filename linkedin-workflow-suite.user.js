@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.3.7
+// @version      1.4.0
 // @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
 // @author       luascfl
 // @license      MIT
@@ -29,12 +29,17 @@
     'lauro de freitas', 'professor', 'recepção', 'técnico', 'temporário', 'voluntário',
   ]);
   const MAX_BULK_ACTIONS = 20;
+  const MAX_RESULT_PAGES = 5;
+  const MAX_LOAD_MORE_CLICKS = 6;
   const PANEL_ID = 'linkedin-workflow-suite-panel';
   const ROUTE_ACTION_BAR_ID = 'linkedin-workflow-suite-actions';
-  const NOTIFICATION_PREFERENCE_ACTIONS = Object.freeze(JSON.parse('[["enter","Pesquisando vaga"],["toggle","Permitir notificações de pesquisa de vagas",true],["enter","Alertas de vaga"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",true],["back"],["enter","Vagas salvas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",true],["back"],["enter","Recomendações de vagas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações sobre candidaturas a vagas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",true],["back"],["enter","Aconselhamento profissional"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Ocorrências em resultados de pesquisa"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Recomendações de avaliação de competências"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações de rotas de competências"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Contratação"],["toggle","Permitir notificações de anúncios de vaga",false],["enter","Projetos de Service Page"],["toggle","Permitir notificações de trabalho de projeto",false],["back"],["enter","Conexão com outras pessoas"],["toggle","Permitir notificações relacionadas a conexões",true],["enter","Convites para conexão"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Atualizações da sua rede"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações para conexão"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Novos seguidores e assinantes"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Atualizações de pessoas que você segue"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações para seguir"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Visualizações do perfil"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações dos seus leads de vendas"],["toggle","Notificações no aplicativo",true],["back"],["back"],["enter","Atualizações para ficar por dentro da rede"],["enter","Mudanças de emprego"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["back"],["enter","Contratando"],["toggle","Notificações no aplicativo",false],["back"],["enter","Aniversários"],["toggle","Notificações no aplicativo",true],["back"],["enter","Aniversários de empresa"],["toggle","Notificações no aplicativo",true],["back"],["enter","Formação acadêmica"],["toggle","Notificações no aplicativo",true],["back"],["enter","Resumo semanal"],["toggle","Notificações push",false],["toggle","E-mail",true],["back"],["back"],["enter","Publicar e comentar"],["toggle","Permitir notificações relacionadas a publicações",true],["enter","Comentários e reações"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Compartilhamentos"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Menções"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Conversas em alta"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Vídeos ao vivo"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Newsletters"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Lembretes para publicar"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Artigos colaborativos"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Sugestões de publicações"],["toggle","Notificações no aplicativo",false],["back"],["enter","Vídeos recomendados"],["toggle","Notificações no aplicativo",false],["back"],["back"],["enter","Mensagens"],["toggle","Permitir notificações de mensagens",true],["enter","Mensagens"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",true],["toggle","E-mail",false],["back"],["enter","Lembretes de mensagem"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","InMail"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Lembretes de InMail"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Grupos"],["toggle","Permitir notificações de grupos",false],["back"],["enter","Pages"],["toggle","Permitir notificações da Page",false],["back"],["enter","Participar de eventos"],["toggle","Permitir notificações de eventos",false],["back"],["enter","Notícias e relatórios"],["toggle","Permitir notificações dos editores",false],["enter","Relatórios e estatísticas"],["toggle","Permitir notificações sobre relatórios e estatísticas",false],["back"],["enter","Atualização do perfil"],["toggle","Permitir notificações de aprimoramento do perfil",true],["enter","Recomendações de perfis"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações de competências"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Dicas e ofertas para aproveitar o LinkedIn"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Verificações"],["toggle","Permitir notificações de verificação",true],["enter","Fazer verificação"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["back"],["enter","Jogos"],["toggle","Permitir notificações sobre jogos",false],["back"]]'));
+  const NOTIFICATION_PREFERENCE_ACTIONS = Object.freeze(JSON.parse('[["enter","Pesquisando vaga"],["toggle","Permitir notificações de pesquisa de vagas",true],["enter","Alertas de vaga"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",true],["back"],["enter","Vagas salvas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",true],["back"],["enter","Recomendações de vagas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações sobre candidaturas a vagas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",true],["radio","Recomendação do LinkedIn"],["back"],["enter","Aconselhamento profissional"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Ocorrências em resultados de pesquisa"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Recomendações de avaliação de competências"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações de rotas de competências"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Contratação"],["toggle","Permitir notificações de anúncios de vaga",false],["enter","Projetos de Service Page"],["toggle","Permitir notificações de trabalho de projeto",false],["back"],["enter","Conexão com outras pessoas"],["toggle","Permitir notificações relacionadas a conexões",true],["enter","Convites para conexão"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Atualizações da sua rede"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações para conexão"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Novos seguidores e assinantes"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Atualizações de pessoas que você segue"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações para seguir"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Visualizações do perfil"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações dos seus leads de vendas"],["toggle","Notificações no aplicativo",true],["back"],["back"],["enter","Atualizações para ficar por dentro da rede"],["enter","Mudanças de emprego"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["back"],["enter","Contratando"],["toggle","Notificações no aplicativo",false],["back"],["enter","Aniversários"],["toggle","Notificações no aplicativo",true],["back"],["enter","Aniversários de empresa"],["toggle","Notificações no aplicativo",true],["back"],["enter","Formação acadêmica"],["toggle","Notificações no aplicativo",true],["back"],["enter","Resumo semanal"],["toggle","Notificações push",false],["toggle","E-mail",true],["back"],["back"],["enter","Publicar e comentar"],["toggle","Permitir notificações relacionadas a publicações",true],["enter","Comentários e reações"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Compartilhamentos"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Menções"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Conversas em alta"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Vídeos ao vivo"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Newsletters"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Lembretes para publicar"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Artigos colaborativos"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Sugestões de publicações"],["toggle","Notificações no aplicativo",false],["back"],["enter","Vídeos recomendados"],["toggle","Notificações no aplicativo",false],["back"],["back"],["enter","Mensagens"],["toggle","Permitir notificações de mensagens",true],["enter","Mensagens"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",true],["toggle","E-mail",false],["back"],["enter","Lembretes de mensagem"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","InMail"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Lembretes de InMail"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Grupos"],["toggle","Permitir notificações de grupos",false],["back"],["enter","Pages"],["toggle","Permitir notificações da Page",false],["back"],["enter","Participar de eventos"],["toggle","Permitir notificações de eventos",false],["back"],["enter","Notícias e relatórios"],["toggle","Permitir notificações dos editores",false],["enter","Relatórios e estatísticas"],["toggle","Permitir notificações sobre relatórios e estatísticas",false],["back"],["enter","Atualização do perfil"],["toggle","Permitir notificações de aprimoramento do perfil",true],["enter","Recomendações de perfis"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações de competências"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Dicas e ofertas para aproveitar o LinkedIn"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Verificações"],["toggle","Permitir notificações de verificação",true],["enter","Fazer verificação"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["back"],["enter","Jogos"],["toggle","Permitir notificações sobre jogos",false],["back"]]'));
+
+  let activeJobFilter = null;
 
   class LinkedInJobFilter {
     constructor() {
+      activeJobFilter = this;
       this.filters = {
         dismissed: { count: 0, active: true, color: '#01754f', position: 114 },
         promoted: { count: 0, active: true, color: '#0a66c2', position: 175 },
@@ -191,6 +196,8 @@
 
     dismissAllJobs() {
       const buttons = Array.from(document.querySelectorAll('button[aria-label^="Fechar vaga"], button[aria-label^="Close job"], button[aria-label^="Cerrar vacante"], button[aria-label^="Fermer loffre"]'));
+      if (!buttons.length) return;
+      if (!confirm(`Ignorar ${buttons.length} vaga(s) visível(is)? Esta ação será enviada ao LinkedIn.`)) return;
       buttons.forEach(btn => btn.click());
       this.badges.dismissAll.style.transform = 'scale(1.1)';
       setTimeout(() => { this.badges.dismissAll.style.transform = 'scale(1)'; }, 200);
@@ -327,24 +334,109 @@
   }
 
   function matchingButtons(label) {
-    return [...document.querySelectorAll('button')]
-      .filter((button) => normalize(button.textContent).toLocaleLowerCase('pt-BR') === label.toLocaleLowerCase('pt-BR'));
+    const candidates = Array.isArray(label) ? label : [label];
+    return [...document.querySelectorAll('button')].filter((button) => {
+      const text = normalize(button.textContent).toLowerCase();
+      const aria = normalize(button.getAttribute('aria-label')).toLowerCase();
+      return candidates.some((candidate) => {
+        const lower = candidate.toLowerCase();
+        return text === lower || aria === lower || aria.startsWith(`${lower} `) || text.startsWith(`${lower} `);
+      });
+    });
   }
 
-  async function performVisibleButtonAction(label, verb) {
-    const buttons = matchingButtons(label).slice(0, MAX_BULK_ACTIONS);
-    if (!buttons.length) {
-      setStatus(`Nenhum botão “${label}” visível.`);
-      return;
+  function resultProgressState(label) {
+    const results = matchingButtons(label)
+      .map((button) => normalize(button.closest('li, article, [role="listitem"], div')?.textContent || button.textContent).slice(0, 120));
+    return `${location.href}|${results.join('|')}`;
+  }
+
+  async function waitForDomStateChange(readState, previousState, timeout = 4000) {
+    const deadline = Date.now() + timeout;
+    while (Date.now() < deadline) {
+      await wait(150);
+      if (readState() !== previousState) return true;
     }
-    if (!confirm(`${verb} ${buttons.length} item(ns) visível(is)? Esta ação será enviada ao LinkedIn.`)) return;
-    for (const button of buttons) {
-      if (button.isConnected && !button.disabled) {
+    return false;
+  }
+
+  function findLoadMoreButton(root = document) {
+    return firstButtonMatching(/^(?:exibir|mostrar|carregar)\s+mais\b|^load more\b/i, root);
+  }
+
+  function findNextPageButton() {
+    return [...document.querySelectorAll('button, a')].find((element) => {
+      const label = `${normalize(element.textContent)} ${normalize(element.getAttribute('aria-label'))}`;
+      return !element.disabled
+        && element.offsetParent !== null
+        && (element.classList.contains('artdeco-pagination__button--next') || /^(?:avançar|next)\b/i.test(label));
+    }) || null;
+  }
+
+  async function advanceResultSurface(label) {
+    const state = resultProgressState(label);
+    const advance = findLoadMoreButton() || findNextPageButton();
+    if (!advance) return { advanced: false, reason: 'no more visible results' };
+    advance.scrollIntoView({ block: 'center' });
+    advance.click();
+    const changed = await waitForDomStateChange(() => resultProgressState(label), state);
+    return changed
+      ? { advanced: true }
+      : { advanced: false, reason: 'the next results did not render' };
+  }
+
+  async function sendConnectionWithoutNote() {
+    const sendWithoutNote = await waitForButton(/^(?:enviar sem nota|send without a note|enviar agora|send now)$/i, 2000);
+    if (!sendWithoutNote) {
+      const modal = document.querySelector('.artdeco-modal, [role="dialog"]');
+      if (modal) return false;
+      return true;
+    }
+    sendWithoutNote.click();
+    await wait(850);
+    return true;
+  }
+
+  async function performPaginatedButtonAction(label, verb, afterClick = null) {
+    if (!confirm(`${verb} visible results across up to ${MAX_RESULT_PAGES} pages and ${MAX_BULK_ACTIONS} actions? This sends requests to LinkedIn.`)) return;
+
+    const processed = new WeakSet();
+    let requested = 0;
+    let pages = 0;
+    let stopReason = 'no more visible results';
+
+    while (pages < MAX_RESULT_PAGES && requested < MAX_BULK_ACTIONS) {
+      const buttons = matchingButtons(label)
+        .filter((button) => button.isConnected && !button.disabled && !processed.has(button));
+      for (const button of buttons) {
+        if (requested >= MAX_BULK_ACTIONS) break;
+        processed.add(button);
+        button.scrollIntoView({ block: 'center' });
         button.click();
+        if (afterClick && !(await afterClick())) {
+          setStatus(`${verb} stopped after ${requested} action(s): the “Send without a note” control was not found.`);
+          return;
+        }
+        requested += 1;
         await wait(850);
       }
+
+      pages += 1;
+      if (requested >= MAX_BULK_ACTIONS) {
+        stopReason = `the ${MAX_BULK_ACTIONS}-action cap was reached`;
+        break;
+      }
+      const progress = await advanceResultSurface(label);
+      if (!progress.advanced) {
+        stopReason = progress.reason;
+        break;
+      }
     }
-    setStatus(`${verb}: ${buttons.length} ação(ões) solicitada(s).`);
+
+    if (pages >= MAX_RESULT_PAGES && requested < MAX_BULK_ACTIONS) {
+      stopReason = `the ${MAX_RESULT_PAGES}-page cap was reached`;
+    }
+    setStatus(`${verb}: ${requested} action(s) requested across ${pages} page(s); stopped because ${stopReason}.`);
   }
 
   function jobCards() {
@@ -405,10 +497,31 @@
   }
 
   function jobAlertEditButtons() {
-    return [...document.querySelectorAll('button')].filter((button) => /editar alerta de vaga/i.test(normalize(button.getAttribute('title'))) || /editar alerta de vaga/i.test(normalize(button.getAttribute('aria-label'))));
+    return [...document.querySelectorAll('button')].filter((button) =>
+      /editar alerta de vaga|edit job alert/i.test(normalize(button.getAttribute('title'))) ||
+      /editar alerta de vaga|edit job alert/i.test(normalize(button.getAttribute('aria-label'))) ||
+      /editar alerta de vaga|edit job alert/i.test(normalize(button.textContent))
+    );
+  }
+
+  async function progressivelyLoadMoreAlerts(maxClicks = MAX_LOAD_MORE_CLICKS) {
+    const container = document.querySelector('.jam-index-modal--body, .artdeco-modal__content, main') || document;
+    let clicks = 0;
+    while (clicks < maxClicks) {
+      const loadMore = findLoadMoreButton(container);
+      if (!loadMore || loadMore.disabled || loadMore.offsetParent === null) break;
+      const countBefore = jobAlertEditButtons().length;
+      loadMore.scrollIntoView({ block: 'center' });
+      loadMore.click();
+      clicks += 1;
+      const changed = await waitForDomStateChange(() => jobAlertEditButtons().length, countBefore, 3000);
+      if (!changed) break;
+    }
+    return clicks;
   }
 
   async function deleteAllJobAlerts() {
+    await progressivelyLoadMoreAlerts();
     const initialCount = jobAlertEditButtons().length;
     if (!initialCount) {
       setStatus('Nenhum alerta de vaga editável foi encontrado.');
@@ -419,12 +532,16 @@
     let deleted = 0;
     while (deleted < initialCount) {
       const editButton = jobAlertEditButtons()[0];
-      if (!editButton) break;
-      editButton.click();
-      const deleteAlert = await waitForButton(/^excluir alerta de vaga$/i);
+      if (!editButton) {
+        await progressivelyLoadMoreAlerts(1);
+        if (!jobAlertEditButtons()[0]) break;
+      }
+      const targetButton = jobAlertEditButtons()[0];
+      targetButton.click();
+      const deleteAlert = await waitForButton(/^(?:excluir alerta de vaga|delete job alert)$/i);
       if (!deleteAlert) break;
       deleteAlert.click();
-      const confirmDelete = await waitForButton(/^excluir$/i);
+      const confirmDelete = await waitForButton(/^(?:excluir|delete)$/i);
       if (!confirmDelete) break;
       confirmDelete.click();
       deleted += 1;
@@ -449,8 +566,9 @@
   }
 
   async function updateJobAlertPreferences() {
+    await progressivelyLoadMoreAlerts();
     const alerts = [...document.querySelectorAll('.jam-index-modal--body ul.artdeco-list > li, ul.artdeco-list > li')]
-      .filter((item) => frequencyText(item).includes('Frequência: Diário via e-mail e notificação'));
+      .filter((item) => /Frequência: Diário via e-mail e notificação|Frequency: Daily via email and notification/i.test(frequencyText(item)));
     if (!alerts.length) {
       setStatus('Nenhum alerta diário por e-mail e notificação foi encontrado.');
       return;
@@ -460,16 +578,16 @@
     let updated = 0;
     for (let index = 0; index < alerts.length; index += 1) {
       const alertItem = [...document.querySelectorAll('.jam-index-modal--body ul.artdeco-list > li, ul.artdeco-list > li')]
-        .find((item) => frequencyText(item).includes('Frequência: Diário via e-mail e notificação'));
-      const editButton = alertItem && firstButtonMatching(/^editar alerta de vaga/i, alertItem);
+        .find((item) => /Frequência: Diário via e-mail e notificação|Frequency: Daily via email and notification/i.test(frequencyText(item)));
+      const editButton = alertItem && firstButtonMatching(/^(?:editar alerta de vaga|edit job alert)/i, alertItem);
       if (!editButton) break;
       editButton.click();
-      const saveButton = await waitForButton(/^salvar$/i);
+      const saveButton = await waitForButton(/^(?:salvar|save)$/i);
       if (!saveButton) break;
-      clickLabelControl('E-mail', 'radio');
+      clickLabelControl('E-mail', 'radio') || clickLabelControl('Email', 'radio');
       const similarJobs = [...document.querySelectorAll('input[type="checkbox"]')].find((input) => {
         const container = input.closest('label, div, section');
-        return /vagas semelhantes/i.test(normalize(container?.textContent));
+        return /vagas semelhantes|similar jobs/i.test(normalize(container?.textContent));
       });
       if (similarJobs?.checked) similarJobs.click();
       saveButton.click();
@@ -483,7 +601,7 @@
     const legacyCards = [...document.querySelectorAll('article.nt-card, .nt-card-list article')];
     if (legacyCards.length) return legacyCards;
 
-    return [...new Set([...document.querySelectorAll('button[aria-label="Mais opções"]')]
+    return [...new Set([...document.querySelectorAll('button[aria-label="Mais opções"], button[aria-label="More options"]')]
       .map((button) => {
         let card = button;
         for (let level = 0; level < 4 && card; level += 1) card = card.parentElement;
@@ -522,15 +640,19 @@
         checkbox.type = 'checkbox';
         checkbox.dataset.linkedinWorkflowSuite = 'notification';
         checkbox.setAttribute('aria-label', 'Selecionar notificação');
-        checkbox.style.cssText = 'height:20px;margin:10px;width:20px;';
+        checkbox.style.cssText = 'height:20px;margin:10px;width:20px;flex-shrink:0;';
         card.style.marginLeft = '40px';
         card.before(checkbox);
+        if (typeof selected === 'boolean') checkbox.checked = selected;
+      } else if (typeof selected === 'boolean') {
+        checkbox.checked = selected;
       }
-      if (typeof selected === 'boolean') checkbox.checked = selected;
     });
-    setStatus(selected === true
-      ? `${cards.length} notificação(ões) selecionada(s).`
-      : `${cards.length} notificação(ões) preparada(s) para revisão.`);
+    if (typeof selected === 'boolean') {
+      setStatus(selected === true
+        ? `${cards.length} notificação(ões) selecionada(s).`
+        : 'Seleção de notificações removida.');
+    }
   }
 
   function toggleNotificationSelection() {
@@ -544,14 +666,18 @@
   }
 
   function notificationMenuAnchor() {
-    const legacy = document.querySelector('.artdeco-card.nt-pill-list.mb3');
+    const legacy = document.querySelector('.artdeco-card.nt-pill-list.mb3, .nt-pill-list, [data-view-name="notifications-header"]');
     if (legacy) return legacy;
-    const allFilter = [...document.querySelectorAll('[role="radio"]')]
-      .find((element) => normalize(element.textContent) === 'Todas');
-    return allFilter?.parentElement?.parentElement || null;
+    const allFilter = [...document.querySelectorAll('[role="radio"], button, a')]
+      .find((element) => /^(?:todas|all)$/i.test(normalize(element.textContent)));
+    if (allFilter) return allFilter.closest('ul, nav, div, section') || allFilter.parentElement;
+    const firstCard = notificationCards()[0];
+    if (firstCard) return firstCard.parentElement;
+    return document.querySelector('main, [role="main"]') || null;
   }
 
   function installLegacyNotificationMenu() {
+    if (!location.pathname.startsWith('/notifications')) return;
     installStyles();
     prepareNotifications();
     if (document.getElementById('linkedin-workflow-suite-notification-menu')) return;
@@ -573,21 +699,23 @@
 
     addLegacyButton('Selecionar Tudo', toggleNotificationSelection);
     addLegacyButton('Excluir Notificações', deleteSelectedNotifications, true);
-    anchor.after(container);
+    if (anchor.tagName === 'MAIN') anchor.prepend(container);
+    else anchor.after(container);
   }
 
   async function dismissNotification(card) {
+    if (!card) return false;
     const legacyDismiss = card.querySelector('[data-control-name="dismiss"], [href="#trash-medium"]');
     if (legacyDismiss) {
       legacyDismiss.click();
       return true;
     }
 
-    const more = card.querySelector('button[aria-label="Mais opções"]');
+    const more = card.querySelector('button[aria-label="Mais opções"], button[aria-label="More options"]');
     if (!more) return false;
     more.click();
     const dismiss = await waitForElement(() => [...document.querySelectorAll('[role="menuitem"]')]
-      .find((element) => normalize(element.textContent) === 'Excluir notificação'));
+      .find((element) => /^(?:excluir notificação|delete notification)$/i.test(normalize(element.textContent))));
     if (!dismiss) return false;
     dismiss.click();
     await waitForElement(() => !document.querySelector('[role="menu"]') ? document.body : null);
@@ -681,16 +809,42 @@
     return true;
   }
 
+  function preferenceRadio(labelText) {
+    const label = [...document.querySelectorAll('label')].find((element) => normalize(element.textContent) === labelText);
+    if (label) {
+      const controlId = label.htmlFor;
+      const directRadio = controlId ? document.getElementById(controlId) : null;
+      const prevRadio = label.previousElementSibling?.matches('input[type="radio"]') ? label.previousElementSibling : null;
+      const nestedRadio = label.querySelector('input[type="radio"]');
+      const radio = directRadio || prevRadio || nestedRadio;
+      if (radio) {
+        if (!radio.checked) radio.click();
+        return true;
+      }
+      label.click();
+      return true;
+    }
+    const radioContainer = [...document.querySelectorAll('[role="radio"], input[type="radio"]')].find((element) => {
+      const text = normalize(element.closest('label, li, div')?.textContent);
+      return text.includes(labelText);
+    });
+    if (radioContainer) {
+      radioContainer.click();
+      return true;
+    }
+    return false;
+  }
+
   async function applyArchivedNotificationPreferences() {
-    if (!confirm('Aplicar o perfil legado de 209 ajustes de notificações? O LinkedIn poderá mudar preferências de e-mail, push e aplicativo.')) return;
+    if (!confirm(`Aplicar o perfil legado de ${NOTIFICATION_PREFERENCE_ACTIONS.length} ajustes de notificações? O LinkedIn poderá mudar preferências de e-mail, push e aplicativo.`)) return;
     let applied = 0;
     for (const action of NOTIFICATION_PREFERENCE_ACTIONS) {
       const [type, label, desired] = action;
-      const success = type === 'enter'
-        ? await enterPreferenceCategory(label)
-        : type === 'toggle'
-          ? preferenceToggle(label, desired)
-          : await goBackInPreferences();
+      let success = false;
+      if (type === 'enter') success = await enterPreferenceCategory(label);
+      else if (type === 'toggle') success = preferenceToggle(label, desired);
+      else if (type === 'radio') success = preferenceRadio(label);
+      else if (type === 'back') success = await goBackInPreferences();
       if (!success) {
         setStatus(`Perfil interrompido: “${label || 'Voltar'}” não foi encontrado após ${applied} ajuste(s).`);
         return;
@@ -706,6 +860,7 @@
       return {
         title: 'Vagas',
         actions: [
+          ['Filtrar vagas visíveis', () => (activeJobFilter?.applyAllFilters() || (activeJobFilter = new LinkedInJobFilter()))],
           ['Salvar vagas visíveis na central', saveVisibleJobs],
           ['Ignorar vaga pelo ID', dismissJobById],
           ['Ignorar vaga marcada pelo fluxo legado', dismissJobFromLegacyCookie],
@@ -722,11 +877,28 @@
         ],
       };
     }
+    if (location.pathname.startsWith('/notifications')) {
+      return {
+        title: 'Notificações',
+        actions: [
+          ['Selecionar Tudo', toggleNotificationSelection],
+          ['Excluir notificações selecionadas', deleteSelectedNotifications, 'danger'],
+        ],
+      };
+    }
+    if (location.pathname.startsWith('/feed')) {
+      return {
+        title: 'Feed',
+        actions: [
+          ['Expandir tópicos visíveis', expandVisibleSections],
+        ],
+      };
+    }
     if (location.pathname.startsWith('/search/results/companies')) {
-      return { title: 'Empresas', actions: [['Seguir empresas visíveis', () => performVisibleButtonAction('Seguir', 'Seguir')]] };
+      return { title: 'Empresas', actions: [['Seguir empresas visíveis', () => performPaginatedButtonAction(['Seguir', 'Follow'], 'Follow')]] };
     }
     if (location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork')) {
-      return { title: 'Pessoas', actions: [['Conectar com pessoas visíveis', () => performVisibleButtonAction('Conectar', 'Conectar')]] };
+      return { title: 'Pessoas', actions: [['Conectar com pessoas visíveis', () => performPaginatedButtonAction(['Conectar', 'Connect'], 'Connect', sendConnectionWithoutNote)]] };
     }
     if (location.pathname.startsWith('/mypreferences/d/categories/notifications')) {
       return { title: 'Preferências de notificação', actions: [['Aplicar perfil legado de notificações', applyArchivedNotificationPreferences, 'danger']] };
@@ -772,14 +944,15 @@
   }
 
   function registerLegacyCommands() {
+    registerLegacyCommand('LinkedIn: filtrar vagas visíveis', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', () => (activeJobFilter?.applyAllFilters() || (activeJobFilter = new LinkedInJobFilter())));
     registerLegacyCommand('LinkedIn: salvar vagas visíveis na central', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', saveVisibleJobs);
     registerLegacyCommand('LinkedIn: ignorar vaga marcada pelo fluxo legado', () => location.pathname.startsWith('/jobs/search'), '/jobs/search/', dismissJobFromLegacyCookie);
     registerLegacyCommand('LinkedIn: expandir alertas de vaga', () => location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage'), '/jobs/jam/', expandVisibleSections);
     registerLegacyCommand('LinkedIn: atualizar preferências dos alertas', () => location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage'), '/jobs/jam/', updateJobAlertPreferences);
     registerLegacyCommand('LinkedIn: excluir todos os alertas', () => location.pathname.startsWith('/jobs/jam') || location.pathname.startsWith('/jobs/alerts/manage'), '/jobs/jam/', deleteAllJobAlerts);
     registerLegacyCommand('LinkedIn: expandir tópicos em alta', () => location.pathname.startsWith('/feed'), '/feed/', expandVisibleSections);
-    registerLegacyCommand('LinkedIn: seguir empresas visíveis', () => location.pathname.startsWith('/search/results/companies'), '/search/results/companies/', () => performVisibleButtonAction('Seguir', 'Seguir'));
-    registerLegacyCommand('LinkedIn: conectar com pessoas visíveis', () => location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork'), '/mynetwork/', () => performVisibleButtonAction('Conectar', 'Conectar'));
+    registerLegacyCommand('LinkedIn: seguir empresas visíveis', () => location.pathname.startsWith('/search/results/companies'), '/search/results/companies/', () => performPaginatedButtonAction(['Seguir', 'Follow'], 'Follow'));
+    registerLegacyCommand('LinkedIn: conectar com pessoas visíveis', () => location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork'), '/mynetwork/', () => performPaginatedButtonAction(['Conectar', 'Connect'], 'Connect', sendConnectionWithoutNote));
     registerLegacyCommand('LinkedIn: ativar seleção de notificações', () => location.pathname.startsWith('/notifications'), '/notifications/?filter=all', installLegacyNotificationMenu);
     registerLegacyCommand('LinkedIn: excluir notificações selecionadas', () => location.pathname.startsWith('/notifications'), '/notifications/?filter=all', deleteSelectedNotifications);
     registerLegacyCommand('LinkedIn: aplicar perfil legado de notificações', () => location.pathname.startsWith('/mypreferences/d/categories/notifications'), '/mypreferences/d/categories/notifications', applyArchivedNotificationPreferences);
@@ -802,6 +975,7 @@
     };
 
     if (location.pathname.startsWith('/jobs/search')) {
+      addButton('Filtrar vagas visíveis', () => (activeJobFilter?.applyAllFilters() || (activeJobFilter = new LinkedInJobFilter())));
       addButton('Salvar vagas visíveis na central', saveVisibleJobs);
       addButton('Ignorar vaga pelo ID', dismissJobById, 'secondary');
       addButton('Ignorar vaga marcada pelo fluxo legado', dismissJobFromLegacyCookie, 'secondary');
@@ -811,14 +985,21 @@
       addButton('Atualizar preferências dos alertas', updateJobAlertPreferences, 'secondary');
       addButton('Excluir todos os alertas', deleteAllJobAlerts, 'danger');
     }
+    if (location.pathname.startsWith('/notifications')) {
+      addButton('Selecionar Tudo', toggleNotificationSelection);
+      addButton('Excluir notificações selecionadas', deleteSelectedNotifications, 'danger');
+    }
     if (location.pathname.startsWith('/feed')) {
       addButton('Expandir tópicos visíveis', expandVisibleSections);
     }
     if (location.pathname.startsWith('/search/results/companies')) {
-      addButton('Seguir empresas visíveis', () => performVisibleButtonAction('Seguir', 'Seguir'));
+      addButton('Seguir empresas visíveis', () => performPaginatedButtonAction(['Seguir', 'Follow'], 'Follow'));
     }
     if (location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork')) {
-      addButton('Conectar com pessoas visíveis', () => performVisibleButtonAction('Conectar', 'Conectar'));
+      addButton('Conectar com pessoas visíveis', () => performPaginatedButtonAction(['Conectar', 'Connect'], 'Connect', sendConnectionWithoutNote));
+    }
+    if (location.pathname.startsWith('/mypreferences/d/categories/notifications')) {
+      addButton('Aplicar perfil legado de notificações', applyArchivedNotificationPreferences, 'danger');
     }
     if (!configuredAdapter()) addButton('Configurar adapter', configureAdapter, 'secondary');
     panel.append(actions);
@@ -833,7 +1014,10 @@
     
     // Garante inicialização das badges visuais na página de vagas
     if (location.pathname.startsWith('/jobs/search') && !document.querySelector('.linkedin-workflow-suite-filter-badge')) {
-      new LinkedInJobFilter();
+      activeJobFilter = new LinkedInJobFilter();
+    }
+    if (location.pathname.startsWith('/notifications')) {
+      installLegacyNotificationMenu();
     }
     installRouteActionBar();
     if (!routeChanged) return;
