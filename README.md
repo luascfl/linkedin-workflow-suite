@@ -24,6 +24,10 @@ Single userscript replacing the archived LinkedIn Automa workflows with manual, 
 
 The endpoint and token are stored strictly in local userscript storage and are never committed or transmitted elsewhere.
 
+## Navigation commands
+
+On any LinkedIn page, the userscript-manager menu provides direct navigation commands for job search, job alerts, feed, company search, people search, notifications, and notification preferences. They only navigate to the corresponding LinkedIn surface. Contextual actions remain separate and continue to require explicit invocation and confirmation.
+
 ## Safety & Limits
 
 - No automatic mutations: all mutating account actions require explicit command execution and confirmation prompts.

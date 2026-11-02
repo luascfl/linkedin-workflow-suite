@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.4.0
-// @description  Migração manual dos fluxos LinkedIn: vagas, alertas, notificações, pessoas e empresas.
+// @version      1.4.1
+// @description  Manual LinkedIn workflows with contextual actions and navigation commands.
 // @author       luascfl
 // @license      MIT
 // @updateURL    https://raw.githubusercontent.com/luascfl/linkedin-workflow-suite/main/linkedin-workflow-suite.user.js
@@ -932,6 +932,27 @@
     main.prepend(bar);
   }
 
+  const NAVIGATION_COMMANDS = Object.freeze([
+    ['job search', '/jobs/search/'],
+    ['job alerts', '/jobs/jam/'],
+    ['feed', '/feed/'],
+    ['company search', '/search/results/companies/'],
+    ['people search', '/search/results/people/'],
+    ['notifications', '/notifications/?filter=all'],
+    ['notification preferences', '/mypreferences/d/categories/notifications'],
+  ]);
+
+  function openLinkedInRoute(destination) {
+    const current = `${location.pathname}${location.search}`;
+    if (current !== destination) location.assign(`https://www.linkedin.com${destination}`);
+  }
+
+  function registerNavigationCommands() {
+    for (const [label, destination] of NAVIGATION_COMMANDS) {
+      GM_registerMenuCommand(`LinkedIn: go to ${label}`, () => openLinkedInRoute(destination));
+    }
+  }
+
   function registerLegacyCommand(label, matchesCurrentRoute, destination, action) {
     GM_registerMenuCommand(label, () => {
       if (!matchesCurrentRoute()) {
@@ -1028,6 +1049,7 @@
     mountPanel();
   };
 
+  registerNavigationCommands();
   if (!configuredAdapter()) GM_registerMenuCommand('Configurar Workflow Sheets Adapter', configureAdapter);
   GM_registerMenuCommand('Reabrir painel LinkedIn Workflow Suite', mountPanel);
   registerLegacyCommands();
