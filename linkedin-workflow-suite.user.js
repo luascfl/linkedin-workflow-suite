@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.4.5
+// @version      1.4.6
 // @description  Manual LinkedIn workflows with contextual actions and navigation commands.
 // @author       luascfl
 // @license      MIT
@@ -907,18 +907,6 @@
     return location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork');
   }
 
-  let suiteUiMutationDepth = 0;
-
-  function mutateSuiteUi(callback) {
-    suiteUiMutationDepth += 1;
-    try {
-      return callback();
-    } finally {
-      window.setTimeout(() => {
-        suiteUiMutationDepth -= 1;
-      }, 0);
-    }
-  }
 
   function isSuiteUiRoot(node) {
     const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
@@ -931,11 +919,7 @@
   }
 
   function removeSuiteElements(selector) {
-    const elements = document.querySelectorAll(selector);
-    if (!elements.length) return;
-    mutateSuiteUi(() => {
-      elements.forEach((element) => element.remove());
-    });
+    document.querySelectorAll(selector).forEach((element) => element.remove());
   }
 
   function removeSuitePanels() {
@@ -955,28 +939,26 @@
     if (!definition || document.querySelectorAll(`#${ROUTE_ACTION_BAR_ID}`).length) return;
     const main = document.querySelector('main, [role="main"]');
     if (!main) return;
-    mutateSuiteUi(() => {
-      installStyles();
-      const bar = document.createElement('section');
-      bar.id = ROUTE_ACTION_BAR_ID;
-      bar.setAttribute(OWNED_UI_ATTRIBUTE, 'route-action-bar');
-      const title = document.createElement('strong');
-      title.textContent = `LinkedIn: ${definition.title}`;
-      bar.append(title);
-      definition.actions.forEach(([label, handler, className = '']) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = label;
-        button.className = className;
-        button.addEventListener('click', () => Promise.resolve(handler()).catch((error) => setStatus(error.message)));
-        bar.append(button);
-      });
-      const status = document.createElement('span');
-      status.className = 'status';
-      status.setAttribute('role', 'status');
-      bar.append(status);
-      main.prepend(bar);
+    installStyles();
+    const bar = document.createElement('section');
+    bar.id = ROUTE_ACTION_BAR_ID;
+    bar.setAttribute(OWNED_UI_ATTRIBUTE, 'route-action-bar');
+    const title = document.createElement('strong');
+    title.textContent = `LinkedIn: ${definition.title}`;
+    bar.append(title);
+    definition.actions.forEach(([label, handler, className = '']) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.className = className;
+      button.addEventListener('click', () => Promise.resolve(handler()).catch((error) => setStatus(error.message)));
+      bar.append(button);
     });
+    const status = document.createElement('span');
+    status.className = 'status';
+    status.setAttribute('role', 'status');
+    bar.append(status);
+    main.prepend(bar);
   }
 
   const NAVIGATION_COMMANDS = Object.freeze([
@@ -1083,11 +1065,9 @@
     }
     if (!configuredAdapter()) addButton('Configurar adapter', configureAdapter, 'secondary');
 
-    mutateSuiteUi(() => {
-      installStyles();
-      removeSuitePanels();
-      document.body.append(panel);
-    });
+    installStyles();
+    removeSuitePanels();
+    document.body.append(panel);
   }
 
   let previousPath = '';
@@ -1123,7 +1103,6 @@
   }
 
   function mutationsRequireRouteRender(records) {
-    if (suiteUiMutationDepth) return false;
     return records.some((record) => {
       if (isOwnedSuiteUiNode(record.target)) return false;
       const changedNodes = [...record.addedNodes, ...record.removedNodes];
