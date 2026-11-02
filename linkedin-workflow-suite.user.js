@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.4.6
+// @version      1.4.7
 // @description  Manual LinkedIn workflows with contextual actions and navigation commands.
 // @author       luascfl
 // @license      MIT
 // @updateURL    https://raw.githubusercontent.com/luascfl/linkedin-workflow-suite/main/linkedin-workflow-suite.user.js
 // @downloadURL  https://raw.githubusercontent.com/luascfl/linkedin-workflow-suite/main/linkedin-workflow-suite.user.js
 // @match        https://www.linkedin.com/*
+// @noframes
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
@@ -18,6 +19,7 @@
 
 (() => {
   'use strict';
+  if (window.top !== window.self) return;
 
   const STORAGE_KEYS = Object.freeze({
     endpoint: 'workflowSheetsEndpoint',
