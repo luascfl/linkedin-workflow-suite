@@ -33,4 +33,5 @@ The userscript-manager menu contains only direct navigation commands. Contextual
 - No automatic mutations: all mutating account actions require explicit command execution and confirmation prompts.
 - Bounded progression: social actions and alert operations enforce hard limits (maximum 5 pages, 6 load-more expansions, and 20 bulk actions per run).
 - Connection invitations resolve modal dialogs by selecting "Send without a note".
+- The suite runs only in the top-level LinkedIn page, never inside embedded frames. People search and My Network show one floating panel with Minimize/Restore; its collapsed state survives SPA navigation and panel replacement.
 - Adapter integration supports outbound capture only (`appendJobAlert`). Inbound creation from sheets is not supported.
