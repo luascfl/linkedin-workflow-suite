@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Workflow Suite
 // @namespace    https://github.com/luascfl/linkedin-workflow-suite
-// @version      1.4.4
+// @version      1.4.5
 // @description  Manual LinkedIn workflows with contextual actions and navigation commands.
 // @author       luascfl
 // @license      MIT
@@ -22,6 +22,7 @@
   const STORAGE_KEYS = Object.freeze({
     endpoint: 'workflowSheetsEndpoint',
     token: 'workflowSheetsAccessToken',
+    panelCollapsed: 'linkedinWorkflowSuitePanelCollapsed',
   });
   const BLOCKED_JOB_TERMS = Object.freeze([
     'assistente', 'auxiliar', 'recepcionista', 'atendente', 'trainee', 'caixa',
@@ -33,6 +34,8 @@
   const MAX_LOAD_MORE_CLICKS = 6;
   const PANEL_ID = 'linkedin-workflow-suite-panel';
   const ROUTE_ACTION_BAR_ID = 'linkedin-workflow-suite-actions';
+  const OWNED_UI_ATTRIBUTE = 'data-linkedin-workflow-suite-ui';
+  const OWNED_UI_SELECTOR = `[${OWNED_UI_ATTRIBUTE}]`;
   const HIDDEN_CLASS = 'linkedin-workflow-suite-hidden';
   const NOTIFICATION_PREFERENCE_ACTIONS = Object.freeze(JSON.parse('[["enter","Pesquisando vaga"],["toggle","Permitir notificações de pesquisa de vagas",true],["enter","Alertas de vaga"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",true],["back"],["enter","Vagas salvas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",true],["back"],["enter","Recomendações de vagas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações sobre candidaturas a vagas"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",true],["radio","Recomendação do LinkedIn"],["back"],["enter","Aconselhamento profissional"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Ocorrências em resultados de pesquisa"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Recomendações de avaliação de competências"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações de rotas de competências"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Contratação"],["toggle","Permitir notificações de anúncios de vaga",false],["enter","Projetos de Service Page"],["toggle","Permitir notificações de trabalho de projeto",false],["back"],["enter","Conexão com outras pessoas"],["toggle","Permitir notificações relacionadas a conexões",true],["enter","Convites para conexão"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Atualizações da sua rede"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações para conexão"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Novos seguidores e assinantes"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Atualizações de pessoas que você segue"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações para seguir"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Visualizações do perfil"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Atualizações dos seus leads de vendas"],["toggle","Notificações no aplicativo",true],["back"],["back"],["enter","Atualizações para ficar por dentro da rede"],["enter","Mudanças de emprego"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["back"],["enter","Contratando"],["toggle","Notificações no aplicativo",false],["back"],["enter","Aniversários"],["toggle","Notificações no aplicativo",true],["back"],["enter","Aniversários de empresa"],["toggle","Notificações no aplicativo",true],["back"],["enter","Formação acadêmica"],["toggle","Notificações no aplicativo",true],["back"],["enter","Resumo semanal"],["toggle","Notificações push",false],["toggle","E-mail",true],["back"],["back"],["enter","Publicar e comentar"],["toggle","Permitir notificações relacionadas a publicações",true],["enter","Comentários e reações"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Compartilhamentos"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Menções"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Conversas em alta"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Vídeos ao vivo"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Newsletters"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Lembretes para publicar"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Artigos colaborativos"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Sugestões de publicações"],["toggle","Notificações no aplicativo",false],["back"],["enter","Vídeos recomendados"],["toggle","Notificações no aplicativo",false],["back"],["back"],["enter","Mensagens"],["toggle","Permitir notificações de mensagens",true],["enter","Mensagens"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",true],["toggle","E-mail",false],["back"],["enter","Lembretes de mensagem"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","InMail"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Lembretes de InMail"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Grupos"],["toggle","Permitir notificações de grupos",false],["back"],["enter","Pages"],["toggle","Permitir notificações da Page",false],["back"],["enter","Participar de eventos"],["toggle","Permitir notificações de eventos",false],["back"],["enter","Notícias e relatórios"],["toggle","Permitir notificações dos editores",false],["enter","Relatórios e estatísticas"],["toggle","Permitir notificações sobre relatórios e estatísticas",false],["back"],["enter","Atualização do perfil"],["toggle","Permitir notificações de aprimoramento do perfil",true],["enter","Recomendações de perfis"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["enter","Novas recomendações de competências"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["enter","Dicas e ofertas para aproveitar o LinkedIn"],["toggle","Notificações no aplicativo",false],["toggle","E-mail",false],["back"],["back"],["enter","Verificações"],["toggle","Permitir notificações de verificação",true],["enter","Fazer verificação"],["toggle","Notificações no aplicativo",true],["toggle","Notificações push",false],["toggle","E-mail",false],["back"],["back"],["enter","Jogos"],["toggle","Permitir notificações sobre jogos",false],["back"]]'));
 
@@ -261,7 +264,7 @@
     if (accessToken === null) return;
     GM_setValue(STORAGE_KEYS.endpoint, endpoint.trim());
     GM_setValue(STORAGE_KEYS.token, accessToken.trim());
-    document.getElementById(PANEL_ID)?.remove();
+    removeSuitePanels();
   }
 
   function requestAdapter(operation, payload) {
@@ -300,13 +303,17 @@
     style.id = `${PANEL_ID}-styles`;
     style.textContent = `
       .${HIDDEN_CLASS} { display: none !important; }
-      #${PANEL_ID} { background: #fff; border: 1px solid #d0d7de; border-radius: 10px; box-shadow: 0 4px 20px #0002; color: #172033; font: 14px system-ui, sans-serif; inset: auto 18px 18px auto; padding: 12px; position: fixed; width: 280px; z-index: 2147483647; }
-      #${PANEL_ID} h2 { font-size: 15px; margin: 0 0 8px; }
+      #${PANEL_ID} { background: #fff; border: 1px solid #d0d7de; border-radius: 10px; box-shadow: 0 4px 20px #0002; box-sizing: border-box; color: #172033; font: 14px system-ui, sans-serif; inset: auto 18px 18px auto; overflow-x: hidden; padding: 12px; position: fixed; width: 280px; z-index: 2147483647; }
+      #${PANEL_ID} .panel-header { align-items: center; display: flex; gap: 8px; justify-content: space-between; }
+      #${PANEL_ID} h2 { font-size: 15px; margin: 0; }
       #${PANEL_ID} p { font-size: 12px; line-height: 1.4; margin: 8px 0; }
       #${PANEL_ID} .actions { display: grid; gap: 6px; }
-      #${PANEL_ID} button { background: #0a66c2; border: 0; border-radius: 6px; color: #fff; cursor: pointer; font: inherit; padding: 8px; text-align: left; }
+      #${PANEL_ID} button { background: #0a66c2; border: 0; border-radius: 6px; box-sizing: border-box; color: #fff; cursor: pointer; font: inherit; padding: 8px; text-align: left; white-space: normal; }
       #${PANEL_ID} button.secondary { background: #4b5563; }
       #${PANEL_ID} button.danger { background: #b42318; }
+      #${PANEL_ID} .panel-toggle { background: #4b5563; flex: 0 0 auto; text-align: center; }
+      #${PANEL_ID}.is-collapsed { padding: 8px; width: auto; }
+      #${PANEL_ID}.is-collapsed h2, #${PANEL_ID}.is-collapsed .panel-body { display: none; }
       #${PANEL_ID} .status { color: #374151; min-height: 18px; }
       #${ROUTE_ACTION_BAR_ID} { align-items:center; background:#fff; border:1px solid #d0d7de; border-radius:8px; display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:10px; }
       #${ROUTE_ACTION_BAR_ID} strong { color:#172033; font:600 14px system-ui,sans-serif; margin-right:4px; }
@@ -890,39 +897,86 @@
     if (location.pathname.startsWith('/search/results/companies')) {
       return { title: 'Empresas', actions: [['Seguir empresas visíveis', () => performPaginatedButtonAction(['Seguir', 'Follow'], 'Follow')]] };
     }
-    if (location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork')) {
-      return { title: 'Pessoas', actions: [['Conectar com pessoas visíveis', () => performPaginatedButtonAction(['Conectar', 'Connect'], 'Connect', sendConnectionWithoutNote)]] };
-    }
     if (location.pathname.startsWith('/mypreferences/d/categories/notifications')) {
       return { title: 'Preferências de notificação', actions: [['Aplicar perfil legado de notificações', applyArchivedNotificationPreferences, 'danger']] };
     }
     return null;
   }
 
+  function isPeopleRoute() {
+    return location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork');
+  }
+
+  let suiteUiMutationDepth = 0;
+
+  function mutateSuiteUi(callback) {
+    suiteUiMutationDepth += 1;
+    try {
+      return callback();
+    } finally {
+      window.setTimeout(() => {
+        suiteUiMutationDepth -= 1;
+      }, 0);
+    }
+  }
+
+  function isSuiteUiRoot(node) {
+    const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+    return Boolean(element?.matches?.(`#${PANEL_ID}, #${ROUTE_ACTION_BAR_ID}, ${OWNED_UI_SELECTOR}`));
+  }
+
+  function isOwnedSuiteUiNode(node) {
+    const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+    return Boolean(element?.closest?.(`#${PANEL_ID}, #${ROUTE_ACTION_BAR_ID}, ${OWNED_UI_SELECTOR}`));
+  }
+
+  function removeSuiteElements(selector) {
+    const elements = document.querySelectorAll(selector);
+    if (!elements.length) return;
+    mutateSuiteUi(() => {
+      elements.forEach((element) => element.remove());
+    });
+  }
+
+  function removeSuitePanels() {
+    removeSuiteElements(`#${PANEL_ID}`);
+  }
+
+  function removeRouteActionBars() {
+    removeSuiteElements(`#${ROUTE_ACTION_BAR_ID}`);
+  }
+
   function installRouteActionBar() {
+    if (isPeopleRoute()) {
+      removeRouteActionBars();
+      return;
+    }
     const definition = routeActionDefinitions();
-    if (!definition || document.getElementById(ROUTE_ACTION_BAR_ID)) return;
+    if (!definition || document.querySelectorAll(`#${ROUTE_ACTION_BAR_ID}`).length) return;
     const main = document.querySelector('main, [role="main"]');
     if (!main) return;
-    installStyles();
-    const bar = document.createElement('section');
-    bar.id = ROUTE_ACTION_BAR_ID;
-    const title = document.createElement('strong');
-    title.textContent = `LinkedIn: ${definition.title}`;
-    bar.append(title);
-    definition.actions.forEach(([label, handler, className = '']) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = label;
-      button.className = className;
-      button.addEventListener('click', () => Promise.resolve(handler()).catch((error) => setStatus(error.message)));
-      bar.append(button);
+    mutateSuiteUi(() => {
+      installStyles();
+      const bar = document.createElement('section');
+      bar.id = ROUTE_ACTION_BAR_ID;
+      bar.setAttribute(OWNED_UI_ATTRIBUTE, 'route-action-bar');
+      const title = document.createElement('strong');
+      title.textContent = `LinkedIn: ${definition.title}`;
+      bar.append(title);
+      definition.actions.forEach(([label, handler, className = '']) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = label;
+        button.className = className;
+        button.addEventListener('click', () => Promise.resolve(handler()).catch((error) => setStatus(error.message)));
+        bar.append(button);
+      });
+      const status = document.createElement('span');
+      status.className = 'status';
+      status.setAttribute('role', 'status');
+      bar.append(status);
+      main.prepend(bar);
     });
-    const status = document.createElement('span');
-    status.className = 'status';
-    status.setAttribute('role', 'status');
-    bar.append(status);
-    main.prepend(bar);
   }
 
   const NAVIGATION_COMMANDS = Object.freeze([
@@ -947,16 +1001,56 @@
   }
 
 
+  function panelMatchesCurrentRoute() {
+    const panels = document.querySelectorAll(`#${PANEL_ID}`);
+    return panels.length === 1
+      && panels[0].isConnected
+      && panels[0].getAttribute(OWNED_UI_ATTRIBUTE) === 'panel'
+      && panels[0].dataset.route === location.pathname;
+  }
+
   function mountPanel() {
-    installStyles();
-    const oldPanel = document.getElementById(PANEL_ID);
-    if (oldPanel) oldPanel.remove();
     const panel = document.createElement('aside');
     panel.id = PANEL_ID;
-    panel.innerHTML = `<h2>LinkedIn Workflow Suite</h2><p>${currentSurface()}</p><div class="actions"></div><p class="status"></p>`;
-    const actions = panel.querySelector('.actions');
+    panel.setAttribute(OWNED_UI_ATTRIBUTE, 'panel');
+    panel.dataset.route = location.pathname;
+
+    const header = document.createElement('div');
+    header.className = 'panel-header';
+    const heading = document.createElement('h2');
+    heading.textContent = 'LinkedIn Workflow Suite';
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'panel-toggle';
+    header.append(heading, toggle);
+
+    const body = document.createElement('div');
+    body.className = 'panel-body';
+    const surface = document.createElement('p');
+    surface.textContent = currentSurface();
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    const status = document.createElement('p');
+    status.className = 'status';
+    status.setAttribute('role', 'status');
+    body.append(surface, actions, status);
+    panel.append(header, body);
+
+    const setCollapsed = (collapsed) => {
+      panel.classList.toggle('is-collapsed', collapsed);
+      toggle.textContent = collapsed ? 'Restore' : 'Minimize';
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+    };
+    setCollapsed(GM_getValue(STORAGE_KEYS.panelCollapsed, false) === true);
+    toggle.addEventListener('click', () => {
+      const collapsed = !panel.classList.contains('is-collapsed');
+      GM_setValue(STORAGE_KEYS.panelCollapsed, collapsed);
+      setCollapsed(collapsed);
+    });
+
     const addButton = (label, handler, className = '') => {
       const button = document.createElement('button');
+      button.type = 'button';
       button.textContent = label;
       button.className = className;
       button.addEventListener('click', () => Promise.resolve(handler()).catch((error) => setStatus(error.message)));
@@ -981,45 +1075,74 @@
     if (location.pathname.startsWith('/search/results/companies')) {
       addButton('Seguir empresas visíveis', () => performPaginatedButtonAction(['Seguir', 'Follow'], 'Follow'));
     }
-    if (location.pathname.startsWith('/search/results/people') || location.pathname.startsWith('/mynetwork')) {
+    if (isPeopleRoute()) {
       addButton('Conectar com pessoas visíveis', () => performPaginatedButtonAction(['Conectar', 'Connect'], 'Connect', sendConnectionWithoutNote));
     }
     if (location.pathname.startsWith('/mypreferences/d/categories/notifications')) {
       addButton('Aplicar perfil legado de notificações', applyArchivedNotificationPreferences, 'danger');
     }
     if (!configuredAdapter()) addButton('Configurar adapter', configureAdapter, 'secondary');
-    panel.append(actions);
-    document.body.append(panel);
+
+    mutateSuiteUi(() => {
+      installStyles();
+      removeSuitePanels();
+      document.body.append(panel);
+    });
   }
 
   let previousPath = '';
-  const renderForRoute = () => {
+  function renderForRoute() {
     const routeChanged = location.pathname !== previousPath;
     previousPath = location.pathname;
     if (location.pathname.startsWith('/feed')) {
       expandVisibleSectionsSilently();
-      document.getElementById(ROUTE_ACTION_BAR_ID)?.remove();
-      document.getElementById(PANEL_ID)?.remove();
+      removeRouteActionBars();
+      removeSuitePanels();
       return;
     }
-    
-    // Garante inicialização das badges visuais na página de vagas
+
     if (location.pathname.startsWith('/jobs/search') && !document.querySelector('.linkedin-workflow-suite-filter-badge')) {
       activeJobFilter = new LinkedInJobFilter();
     }
     if (location.pathname.startsWith('/notifications')) {
       installLegacyNotificationMenu();
     }
+    if (isPeopleRoute()) {
+      removeRouteActionBars();
+      if (!panelMatchesCurrentRoute()) mountPanel();
+      return;
+    }
+
     installRouteActionBar();
     if (!routeChanged) return;
     if (configuredAdapter()) {
-      document.getElementById(PANEL_ID)?.remove();
+      removeSuitePanels();
       return;
     }
     mountPanel();
-  };
+  }
+
+  function mutationsRequireRouteRender(records) {
+    if (suiteUiMutationDepth) return false;
+    return records.some((record) => {
+      if (isOwnedSuiteUiNode(record.target)) return false;
+      const changedNodes = [...record.addedNodes, ...record.removedNodes];
+      return changedNodes.some((node) => isSuiteUiRoot(node) || !isOwnedSuiteUiNode(node));
+    });
+  }
+
+  let routeRenderTimer = null;
+  function scheduleRouteRender() {
+    if (routeRenderTimer !== null) return;
+    routeRenderTimer = window.setTimeout(() => {
+      routeRenderTimer = null;
+      renderForRoute();
+    }, 0);
+  }
 
   registerNavigationCommands();
   renderForRoute();
-  new MutationObserver(renderForRoute).observe(document.documentElement, { childList: true, subtree: true });
+  new MutationObserver((records) => {
+    if (mutationsRequireRouteRender(records)) scheduleRouteRender();
+  }).observe(document.documentElement, { childList: true, subtree: true });
 })();
